@@ -12,35 +12,44 @@
 #include <iconv.h>
 #include <cstring>
 
-using namespace std;
-
 //编码转换，source_charset是源编码，to_charset是目标编码
-std::string code_convert(char* source_charset, char* to_charset, const std::string& sourceStr) //sourceStr是源编码字符串
+std::string myIconv(const char* fromCharset, const char* toCharset, const std::string& str) //sourceStr是源编码字符串
 {
-	iconv_t cd = iconv_open(to_charset, source_charset); //获取转换句柄，void*类型
-	if (cd == 0)
-		return "";
+	std::string destString;
 
-	size_t inlen  = sourceStr.size();
-	size_t outlen = 255;
-	char*  inbuf  = (char*) sourceStr.c_str();
-	char   outbuf[255]; //这里实在不知道需要多少个字节，这是个问题
-	//char *outbuf = new char[outlen]; 另外outbuf不能在堆上分配内存，否则转换失败，猜测跟iconv函数有关
-	memset(outbuf, 0, outlen);
+	iconv_t cd = iconv_open(toCharset, fromCharset); //获取转换句柄，void*类型
+	if ((iconv_t) -1 == cd)
+		return destString;
 
-	char* poutbuf = outbuf; //多加这个转换是为了避免iconv这个函数出现char(*)[255]类型的实参与char**类型的形参不兼容
-	if (iconv(cd, &inbuf, &inlen, &poutbuf, &outlen) == -1)
-		return "";
+	size_t inSize = str.size();
+	if (0 == inSize)
+		return destString;
 
-	std::string strTemp(outbuf); //此时的strTemp为转换编码之后的字符串
+	const size_t originalInSize = inSize;
+
+	char* inBuffer = const_cast<char*>(str.c_str());
+
+	size_t outSize    = 2 * inSize; // 2倍长度够长了吧！！
+	char*  outBuffer = new char[outSize];
+	memset(outBuffer, 0, outSize);
+	const char* originalOutBuffer = outBuffer; // 用于delete[]操作
+
+	if ((size_t)(-1) != iconv(cd, &inBuffer, &inSize, &outBuffer, &outSize))
+		destString = std::string(originalOutBuffer, outSize);
+
+	std::cout << "iconv: " << fromCharset << " (" << originalInSize << ") to " << toCharset << " (" << outSize << ")" << std::endl;
+
+	// free resoure
 	iconv_close(cd);
-	return strTemp;
+	delete[] originalOutBuffer;
+
+	return destString;
 }
 
 int main()
 {
 	//1、ANSI/GBK编码
-	string strGbk = "我";
+	std::string strGbk = "我";
 	int    num    = strGbk.size(); //获取两个字符数，也是我字所占的字节数
 
 	unsigned char* p = (unsigned char*) strGbk.c_str();
@@ -50,5 +59,8 @@ int main()
 	} //输出ced2 所以我的GBK编码是0xced2
 	printf("\n");
 
+	std::cout << myIconv("utf-8", "gb2312", "2323的") << std::endl;
+
 	return 0;
 }
+
