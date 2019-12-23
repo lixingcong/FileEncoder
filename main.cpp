@@ -11,8 +11,9 @@
 #include <string>
 #include <iconv.h>
 #include <cstring>
+#include <fstream>
 
-//编码转换，source_charset是源编码，to_charset是目标编码
+// 编码转换，fromCharset是源编码，toCharset是目标编码
 std::string myIconv(const char* fromCharset, const char* toCharset, const std::string& str) //sourceStr是源编码字符串
 {
 	std::string destString;
@@ -35,9 +36,9 @@ std::string myIconv(const char* fromCharset, const char* toCharset, const std::s
 	const char* originalOutBuffer = outBuffer; // 用于delete[]操作
 
 	if ((size_t)(-1) != iconv(cd, &inBuffer, &inSize, &outBuffer, &outSize))
-		destString = std::string(originalOutBuffer, outSize);
+		destString = std::string(originalOutBuffer);
 
-	std::cout << "iconv: " << fromCharset << " (" << originalInSize << ") to " << toCharset << " (" << outSize << ")" << std::endl;
+	std::cout << "iconv: " << fromCharset << " (" << originalInSize << " Bytes) to " << toCharset << " (" << destString.size() << " Bytes)" << std::endl;
 
 	// free resoure
 	iconv_close(cd);
@@ -46,20 +47,17 @@ std::string myIconv(const char* fromCharset, const char* toCharset, const std::s
 	return destString;
 }
 
-int main()
+int main(int argc, char** argv)
 {
-	//1、ANSI/GBK编码
-	std::string strGbk = "我";
-	int    num    = strGbk.size(); //获取两个字符数，也是我字所占的字节数
+	std::ifstream ifs("/tmp/gbk.txt");
+	std::string   inContent((std::istreambuf_iterator<char>(ifs)), (std::istreambuf_iterator<char>()));
 
-	unsigned char* p = (unsigned char*) strGbk.c_str();
-	for (int i = 0; i < num; i++) {
-		printf("%0x", *p);
-		p++;
-	} //输出ced2 所以我的GBK编码是0xced2
-	printf("\n");
+	std::string outContent = myIconv("gb2312", "utf-8", inContent);
+	//std::cout << myIconv("utf-8", "gb2312", content) << std::endl;
+	//std::cout << myIconv("gb2312", "utf-8", content) << std::endl;
 
-	std::cout << myIconv("utf-8", "gb2312", "2323的") << std::endl;
+	std::ofstream ofs("/tmp/result.txt");
+	ofs << outContent;
 
 	return 0;
 }
