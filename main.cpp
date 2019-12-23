@@ -16,15 +16,13 @@
 // 编码转换，fromCharset是源编码，toCharset是目标编码
 std::string myIconv(const char* fromCharset, const char* toCharset, const std::string& str) //sourceStr是源编码字符串
 {
-	std::string destString;
+	size_t inSize = str.size();
+	if (0 == inSize)
+		return std::string();
 
 	iconv_t cd = iconv_open(toCharset, fromCharset); //获取转换句柄，void*类型
 	if ((iconv_t) -1 == cd)
-		return destString;
-
-	size_t inSize = str.size();
-	if (0 == inSize)
-		return destString;
+		return std::string();
 
 	const size_t originalInSize = inSize;
 
@@ -35,6 +33,7 @@ std::string myIconv(const char* fromCharset, const char* toCharset, const std::s
 	memset(outBuffer, 0, outSize);
 	const char* originalOutBuffer = outBuffer; // 用于delete[]操作
 
+	std::string destString;
 	if ((size_t)(-1) != iconv(cd, &inBuffer, &inSize, &outBuffer, &outSize))
 		destString = std::string(originalOutBuffer);
 
