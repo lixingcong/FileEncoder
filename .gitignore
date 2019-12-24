@@ -11,5 +11,8 @@ compile_commands.json
 CTestTestfile.cmake
 _deps
 
+# auto save
+*.autosave
+
 # build dir
 /build/
