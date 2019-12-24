@@ -1,8 +1,4 @@
 ﻿/*
- * %{Cpp:License:FileName}
- *
- * FIXME: 功能简要概述
- *
  * Created on: 2019年 12月 23日
  * Author: lixingcong
  */
@@ -12,6 +8,10 @@
 #include <iconv.h>
 #include <cstring>
 #include <fstream>
+
+#if defined(_MSC_VER) && (_MSC_VER > 1600)
+#pragma execution_character_set("utf-8")
+#endif
 
 // 编码转换，fromCharset是源编码，toCharset是目标编码
 std::string myIconv(const char* fromCharset, const char* toCharset, const std::string& str) //sourceStr是源编码字符串
@@ -26,7 +26,7 @@ std::string myIconv(const char* fromCharset, const char* toCharset, const std::s
 
 	const size_t originalInSize = inSize;
 
-	char* inBuffer = const_cast<char*>(str.c_str());
+	const char* inBuffer = str.c_str();
 
 	size_t outSize    = 2 * inSize; // 2倍长度够长了吧！！
 	char*  outBuffer = new char[outSize];
@@ -48,14 +48,22 @@ std::string myIconv(const char* fromCharset, const char* toCharset, const std::s
 
 int main(int argc, char** argv)
 {
+#if defined(_MSC_VER)
+	std::ifstream ifs("Z:\\gbk.txt");
+#else
 	std::ifstream ifs("/tmp/gbk.txt");
+#endif
 	std::string   inContent((std::istreambuf_iterator<char>(ifs)), (std::istreambuf_iterator<char>()));
 
 	std::string outContent = myIconv("gb2312", "utf-8", inContent);
 	//std::cout << myIconv("utf-8", "gb2312", content) << std::endl;
 	//std::cout << myIconv("gb2312", "utf-8", content) << std::endl;
 
+#if defined(_MSC_VER)
+	std::ofstream ofs("Z:\\result.txt");
+#else
 	std::ofstream ofs("/tmp/result.txt");
+#endif
 	ofs << outContent;
 
 	return 0;

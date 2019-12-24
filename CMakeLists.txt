@@ -6,11 +6,11 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 INCLUDE_DIRECTORIES(
-	"/tmp/SYS/include"
+	"include"
 )
 
 LINK_DIRECTORIES(
-	"/tmp/SYS/lib"
+	"lib"
 )
 
 LINK_LIBRARIES(iconv)
