@@ -29,6 +29,7 @@ Linux
 ```
 mkdir build && cd build
 cmake ..
+make
 ```
 
 Windows
@@ -53,4 +54,17 @@ Windows
 ```
 # 建议写入到1.cmd文件运行，用PowerShell会有美元转义
 .\FileEncoder.exe gbk.txt utf8.txt gb2312 utf-8 "(STR)(\(\"".*?\""\)):MYSTR$2"
+```
+
+正则表达式替换不是必要的，可以省略该参数，只进行文件编码转换
+
+```
+./FileEncoder gbk.txt utf8.txt gb2312 utf-8
+```
+
+正则表达式替换可以先后进行多个，以逗号和分号间隔
+
+```
+# 先替换abc为xyz，再替换123为456
+./FileEncoder gbk.txt utf8.txt gb2312 utf-8 'abc:xyz;123:456'
 ```
