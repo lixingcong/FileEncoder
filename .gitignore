@@ -16,3 +16,7 @@ _deps
 
 # build dir
 /build/
+/lib/*
+!/lib/.noempty
+/include/*
+!/include/.noempty

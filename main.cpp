@@ -27,10 +27,16 @@ std::string myIconv(const char* fromCharset, const char* toCharset, const std::s
 	if ((iconv_t) -1 == cd)
 		return std::string();
 
-	const size_t originalInSize = inSize;
-
+#if defined(__linux__)
+	char* inBuffer = const_cast<char*>(str.c_str());
+#elif defined(_WIN32)
 	const char* inBuffer = str.c_str();
+#else
+	std::cerr << "Unsupport OS!" << std::endl;
+	return std::string();
+#endif
 
+	const size_t originalInSize = inSize;
 	size_t outSize    = 2 * inSize; // 2倍长度够长了吧！！
 	char*  outBuffer = new char[outSize];
 	memset(outBuffer, 0, outSize);
@@ -52,6 +58,7 @@ std::string myIconv(const char* fromCharset, const char* toCharset, const std::s
 // C++11 std::ECMAScript syntax
 std::string myRegex(const char* findRegex, const char* replaceTo, const std::string& str)
 {
+	std::cout << "Replacing: " << findRegex << " ---> " << replaceTo << std::endl;
 	std::regex re(findRegex);
 	return std::regex_replace(str, re, replaceTo, std::regex_constants::format_default);
 }
@@ -104,7 +111,6 @@ int main(int argc, char** argv)
 
 			ReplacePair p;
 			ss2 >> p.findRegex >> p.replaceTo;
-			std::cout << "FFF: " << p.findRegex << ",    " << p.replaceTo << std::endl;
 			replaceStrPairs.push_back(p);
 		}
 	}
@@ -122,7 +128,6 @@ int main(int argc, char** argv)
 	for (auto it = replaceStrPairs.begin(); it != replaceStrPairs.end(); ++it){
 		outContent = myRegex((*it).findRegex.c_str(), (*it).replaceTo.c_str(), outContent);
 	}
-	//outContent = myRegex("(STR)(\\(\".*?\"\\))", "FUCK$2", outContent);
 
 	std::ofstream ofs(destFileName);
 	ofs << outContent;
