@@ -52,8 +52,11 @@ Linux
 Windows
 
 ```
-# 建议写入到1.cmd文件运行，用PowerShell会有美元转义
+# CMD: 没有美元转义，因此双引号，或者不用双引号
 .\FileEncoder.exe gbk.txt utf8.txt gb2312 utf-8 "(STR)(\(\"".*?\""\)):MYSTR$2"
+
+# PowerShell: 有美元转义，因此单引号
+.\FileEncoder.exe gbk.txt utf8.txt gb2312 utf-8 '(STR)(\(\"".*?\""\)):MYSTR$2'
 ```
 
 正则表达式替换不是必要的，可以省略该参数，只进行文件编码转换
