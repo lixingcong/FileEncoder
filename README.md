@@ -1,5 +1,19 @@
 ﻿转换文本编码，并进行正则替换
 
+## 效果
+
+测试文本 gbk.txt 编码为GB2312
+```
+STR("hello"), STR("world")
+DDD("hello"), FFF("world")
+```
+
+输出结果 utf8.txt 编码为UTF8
+```
+MYSTR("hello"), MYSTR("world")
+DDD("hello"), FFF("world")
+```
+
 ## 编译
 
 要求C++11，GCC4.9以上，MSVC为VS2013以上
